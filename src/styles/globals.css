@@ -47,6 +47,16 @@
     cursor: none !important;
   }
 
+  /* A modal <dialog> renders in the top layer, above any z-index, so the custom cursor would be
+     hidden behind it. While one is open, hand control back to the native cursor. */
+  html.has-custom-cursor:has(dialog[open]),
+  html.has-custom-cursor:has(dialog[open]) * {
+    cursor: revert !important;
+  }
+  html:has(dialog[open]) .custom-cursor {
+    display: none;
+  }
+
   /* Keep password-manager autofill on-brand instead of Chrome's pale yellow/blue. */
   input:-webkit-autofill,
   input:-webkit-autofill:hover,

@@ -28,7 +28,7 @@ function overviewPose(mode: SceneMode, unit: UnitRef | null, layout: Layout): Po
   if (register) target.y = 5.9;
   // While registering, ease the view towards the floor being typed.
   if (register && unit) target.y = target.y * 0.55 + windowPlacement(unit).y * 0.45;
-  const direction = register ? new Vector3(0.55, 0.3, 0.78) : new Vector3(0.5, 0.06, 0.86);
+  const direction = register ? new Vector3(0.55, 0.19, 0.8) : new Vector3(0.5, 0.06, 0.86);
   const distance = (register ? 29 : 27) * DISTANCE_SCALE[layout].overview;
   return { target, position: target.clone().add(direction.normalize().multiplyScalar(distance)) };
 }

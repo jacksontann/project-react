@@ -105,3 +105,6 @@ export const useSceneStore = create<SceneState>()((set, get) => ({
 }));
 
 export const sceneActions = () => useSceneStore.getState();
+
+/** Invalid submit / failed request: the lights flicker and the panel shakes. */
+export const signalSceneError = () => useSceneStore.getState().emit('error');

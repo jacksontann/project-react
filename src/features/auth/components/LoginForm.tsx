@@ -8,7 +8,7 @@ import { Checkbox } from 'components/ui/Checkbox';
 import { FormAlert } from 'components/ui/FormAlert';
 import { PasswordField } from 'components/ui/PasswordField';
 import { TextField } from 'components/ui/TextField';
-import { useSceneStore } from 'features/scene/sceneStore';
+import { signalSceneError, useSceneStore } from 'features/scene/sceneStore';
 import { useCountdown } from 'hooks/useCountdown';
 import { ApiError } from 'lib/http';
 import { wait } from 'lib/wait';
@@ -97,7 +97,7 @@ export function LoginForm() {
           setAlert(error.message);
       }
     }
-  });
+  }, signalSceneError);
 
   const fillDemoAccount = () => {
     setValue('email', DEMO_ACCOUNT.email, { shouldValidate: true, shouldDirty: true });
@@ -136,7 +136,7 @@ export function LoginForm() {
         state={submitState}
         loadingText="Unlocking…"
         disabled={locked}
-        data-cursor="magnetic"
+        magnetic
       >
         {locked ? (
           <span className="tabular-nums">Try again in {secondsLeft}s</span>

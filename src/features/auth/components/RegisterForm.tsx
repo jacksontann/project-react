@@ -8,7 +8,7 @@ import { Checkbox } from 'components/ui/Checkbox';
 import { FormAlert } from 'components/ui/FormAlert';
 import { PasswordField } from 'components/ui/PasswordField';
 import { TextField } from 'components/ui/TextField';
-import { useSceneStore } from 'features/scene/sceneStore';
+import { signalSceneError, useSceneStore } from 'features/scene/sceneStore';
 import { ApiError } from 'lib/http';
 import { wait } from 'lib/wait';
 import { authApi } from '../api';
@@ -148,7 +148,7 @@ export function RegisterForm() {
         setAlert('Something went wrong. Please try again.');
       }
     }
-  });
+  }, signalSceneError);
 
   return (
     <form onSubmit={onSubmit} noValidate className="mt-8">
@@ -222,7 +222,7 @@ export function RegisterForm() {
         className="mt-7 w-full"
         state={submitState}
         loadingText="Building…"
-        data-cursor="magnetic"
+        magnetic
       >
         Create account <ArrowRight className="size-4" aria-hidden="true" />
       </Button>

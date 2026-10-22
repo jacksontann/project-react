@@ -105,7 +105,10 @@ export function Skyline() {
       const far = radius / 71;
       dummy.position.set(x, 0, z);
       dummy.rotation.set(0, Math.round(random() * 4) * (Math.PI / 2) + (random() - 0.5) * 0.3, 0);
-      dummy.scale.set(1.4 + random() * 2.6, 1.5 + random() * (3.5 + far * 8), 1.4 + random() * 2.6);
+      // Mostly low-rise with the odd tower, so the silhouette never reads as a flat wall.
+      const tower = random() < 0.14 ? 1.9 : 1;
+      const height = (1.2 + random() ** 1.6 * (4 + far * 8)) * tower;
+      dummy.scale.set(1.4 + random() * 2.6, height, 1.4 + random() * 2.6);
       dummy.updateMatrix();
       instanced.setMatrixAt(placed, dummy.matrix);
       placed += 1;

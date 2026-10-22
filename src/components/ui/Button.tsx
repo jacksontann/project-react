@@ -1,16 +1,19 @@
-import type { ComponentProps, MouseEvent } from 'react';
+import { useRef, type ComponentProps, type MouseEvent } from 'react';
 import { Check } from 'lucide-react';
+import { useMagnetic } from 'hooks/useMagnetic';
 import { cn } from 'lib/cn';
 import { Spinner } from './Spinner';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'ghost';
 export type ButtonState = 'idle' | 'loading' | 'success';
 
-interface ButtonProps extends ComponentProps<'button'> {
+interface ButtonProps extends Omit<ComponentProps<'button'>, 'ref'> {
   variant?: ButtonVariant;
   /** Visual state machine: idle → loading (spinner + progress hairline) → success (✓). */
   state?: ButtonState;
   loadingText?: string;
+  /** Primary calls to action lean towards the pointer and get the large cursor halo. */
+  magnetic?: boolean;
 }
 
 const variantClasses: Record<ButtonVariant, string> = {
@@ -29,9 +32,12 @@ export function Button({
   children,
   onClick,
   type = 'button',
+  magnetic = false,
   ...props
 }: ButtonProps) {
+  const ref = useRef<HTMLButtonElement>(null);
   const busy = state !== 'idle';
+  useMagnetic(ref, { enabled: magnetic });
 
   // While busy the button stays focusable (no `disabled`), so keyboard focus isn't lost mid-submit.
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
@@ -44,13 +50,15 @@ export function Button({
 
   return (
     <button
+      ref={ref}
       type={type}
       aria-disabled={busy || undefined}
       aria-busy={state === 'loading' || undefined}
+      data-cursor={magnetic ? 'magnetic' : undefined}
       onClick={handleClick}
       className={cn(
         'relative inline-flex h-12 select-none items-center justify-center gap-2 overflow-hidden rounded-field px-5 text-[15px] font-medium',
-        'transition-[background-color,color,box-shadow,transform] duration-200 ease-out-expo',
+        'transition-[background-color,color,box-shadow,transform,translate] duration-200 ease-out-expo',
         'enabled:active:scale-[0.985] disabled:cursor-not-allowed',
         variantClasses[variant],
         className,

@@ -3,6 +3,7 @@ import { useReducedMotion } from 'framer-motion';
 import { LogOut } from 'lucide-react';
 import { Button } from 'components/ui/Button';
 import { Eyebrow } from 'components/ui/Eyebrow';
+import { Headline } from 'components/ui/Headline';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { useAuth } from 'features/auth/AuthProvider';
 import { displayName } from 'features/auth/displayName';
@@ -46,12 +47,7 @@ export function HomePage() {
     <>
       <header>
         <Eyebrow>{unit ? describeUnit(unit) : 'Resident'}</Eyebrow>
-        <h1
-          tabIndex={-1}
-          className="mt-4 font-display text-[44px] leading-[0.95] tracking-[-0.01em] text-ink outline-none sm:text-[52px]"
-        >
-          Lights on, <em className="text-lamp">{displayName(resident.name)}.</em>
-        </h1>
+        <Headline lead="Lights on," accent={`${displayName(resident.name)}.`} />
         <p className="mt-3 text-ink-muted">You're signed in to Lumen Residences.</p>
       </header>
 

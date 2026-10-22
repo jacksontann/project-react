@@ -3,7 +3,8 @@ import { Stars } from '@react-three/drei';
 import { AdditiveBlending, BackSide, Color, ShaderMaterial } from 'three';
 import { PODIUM_H, TOWER_D } from '../geometry';
 
-export const FOG_COLOR = '#0a0d16';
+/** Also the sky's horizon colour, so fogged ground melts into the sky with no visible seam. */
+export const FOG_COLOR = '#121726';
 export const FOG_DENSITY = 0.03;
 
 const skyVertex = /* glsl */ `
@@ -16,14 +17,14 @@ const skyVertex = /* glsl */ `
 
 /** Deep night overhead, a cool horizon, and the faint sodium glow of a city below it. */
 const skyFragment = /* glsl */ `
+  uniform vec3 uHorizon;
   varying vec3 vDirection;
   void main() {
     float h = vDirection.y;
-    vec3 top = vec3(0.004, 0.005, 0.010);
-    vec3 horizon = vec3(0.030, 0.036, 0.060);
-    vec3 cityGlow = vec3(0.075, 0.045, 0.022);
-    vec3 color = mix(horizon, top, smoothstep(-0.02, 0.5, h));
-    color += cityGlow * exp(-max(h, 0.0) * 12.0) * 0.8;
+    vec3 top = vec3(0.003, 0.004, 0.008);
+    vec3 cityGlow = vec3(0.07, 0.04, 0.02);
+    vec3 color = mix(uHorizon, top, smoothstep(0.0, 0.5, h));
+    color += cityGlow * exp(-max(h, 0.0) * 12.0) * smoothstep(-0.01, 0.02, h);
     gl_FragColor = vec4(color, 1.0);
     #include <tonemapping_fragment>
     #include <colorspace_fragment>
@@ -54,6 +55,7 @@ export function Environment() {
       new ShaderMaterial({
         vertexShader: skyVertex,
         fragmentShader: skyFragment,
+        uniforms: { uHorizon: { value: new Color(FOG_COLOR) } },
         side: BackSide,
         depthWrite: false,
       }),
