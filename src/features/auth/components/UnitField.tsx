@@ -30,7 +30,7 @@ export function UnitField({ registration, value, error }: UnitFieldProps) {
       autoComplete="off"
       placeholder="12-03"
       maxLength={5}
-      hint="Floor and unit, e.g. 12-03."
+      hint="Floor and unit, e.g. 12-03. Or pick your window on the tower."
       error={error}
       {...registration}
       onChange={handleChange}

@@ -1,4 +1,5 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useReducedMotion } from 'framer-motion';
 import { LogOut } from 'lucide-react';
 import { Button } from 'components/ui/Button';
 import { Eyebrow } from 'components/ui/Eyebrow';
@@ -7,25 +8,38 @@ import { useAuth } from 'features/auth/AuthProvider';
 import { displayName } from 'features/auth/displayName';
 import type { User } from 'features/auth/schemas';
 import { describeUnit, parseUnit } from 'features/auth/unit';
+import { useSceneStore } from 'features/scene/sceneStore';
 
 const memberSince = new Intl.DateTimeFormat('en-MY', { month: 'long', year: 'numeric' });
+
+/** Long enough for the lights to go out floor by floor before the page changes. */
+const SIGN_OUT_SWEEP_MS = 1100;
 
 export function HomePage() {
   usePageTitle('Home');
   const { user, signOut } = useAuth();
+  const prefersReducedMotion = useReducedMotion();
   const [signingOut, setSigningOut] = useState(false);
 
   // Keep showing the resident while the page animates out after sign-out.
   const lastUser = useRef<User | null>(user);
   if (user) lastUser.current = user;
   const resident = lastUser.current;
+  const unitValue = resident?.unit ?? '';
+
+  // The resident's own window stays lit in the scene (also after a page reload).
+  useEffect(() => {
+    if (user) useSceneStore.getState().setUnit(parseUnit(unitValue));
+  }, [user, unitValue]);
+
   if (!resident) return null;
 
   const unit = parseUnit(resident.unit);
 
   const handleSignOut = async () => {
     setSigningOut(true);
-    await signOut({ minDuration: 700 });
+    useSceneStore.getState().emit('signout');
+    await signOut({ minDuration: prefersReducedMotion ? 0 : SIGN_OUT_SWEEP_MS });
   };
 
   return (

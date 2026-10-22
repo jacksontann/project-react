@@ -8,6 +8,7 @@ import { Checkbox } from 'components/ui/Checkbox';
 import { FormAlert } from 'components/ui/FormAlert';
 import { PasswordField } from 'components/ui/PasswordField';
 import { TextField } from 'components/ui/TextField';
+import { useSceneStore } from 'features/scene/sceneStore';
 import { useCountdown } from 'hooks/useCountdown';
 import { ApiError } from 'lib/http';
 import { wait } from 'lib/wait';
@@ -16,6 +17,7 @@ import { useAuth } from '../AuthProvider';
 import { DEMO_ACCOUNT } from '../demo';
 import { applyServerFieldErrors } from '../formErrors';
 import { loginFormSchema, type LoginFormInput, type LoginFormOutput } from '../schemas';
+import { parseUnit } from '../unit';
 
 /** How long the ✓ state holds before the session is committed and the page changes. */
 const SUCCESS_HOLD_MS = 650;
@@ -53,16 +55,21 @@ export function LoginForm() {
 
   const onSubmit = handleSubmit(async (values) => {
     if (submitState !== 'idle' || locked) return;
+    const scene = useSceneStore.getState();
     setAlert(null);
     setSubmitState('loading');
+    scene.emit('submitting');
 
     try {
       const session = await authApi.login(values);
       setSubmitState('success');
+      // Your window lights up and the light ripples through the tower before the page changes.
+      scene.emit('success', parseUnit(session.user.unit));
       await wait(prefersReducedMotion ? 0 : SUCCESS_HOLD_MS);
       signIn(session, values.remember);
     } catch (error) {
       setSubmitState('idle');
+      scene.emit('error');
       if (!(error instanceof ApiError)) {
         setAlert('Something went wrong. Please try again.');
         return;

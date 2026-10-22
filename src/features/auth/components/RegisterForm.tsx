@@ -8,6 +8,7 @@ import { Checkbox } from 'components/ui/Checkbox';
 import { FormAlert } from 'components/ui/FormAlert';
 import { PasswordField } from 'components/ui/PasswordField';
 import { TextField } from 'components/ui/TextField';
+import { useSceneStore } from 'features/scene/sceneStore';
 import { ApiError } from 'lib/http';
 import { wait } from 'lib/wait';
 import { authApi } from '../api';
@@ -16,12 +17,14 @@ import { applyServerFieldErrors } from '../formErrors';
 import { useBreachCheck } from '../hooks/useBreachCheck';
 import { usePasswordStrength } from '../hooks/usePasswordStrength';
 import { loadStrengthEngine, strengthUserInputs, validateNewPassword } from '../passwordPolicy';
+import { registrationProgress } from '../registrationProgress';
 import {
   PASSWORD_MIN_LENGTH,
   registerFormSchema,
   type RegisterFormInput,
   type RegisterFormOutput,
 } from '../schemas';
+import { formatUnit, parseUnit } from '../unit';
 import { HouseRulesDialog } from './HouseRulesDialog';
 import { PasswordInsights } from './PasswordInsights';
 import { UnitField } from './UnitField';
@@ -44,6 +47,7 @@ export function RegisterForm() {
     control,
     handleSubmit,
     setError,
+    setValue,
     trigger,
     getFieldState,
     formState: { errors },
@@ -60,24 +64,57 @@ export function RegisterForm() {
     },
   });
 
-  const [name, email, unit, password] = useWatch({
+  const [name, email, unit, password, confirmPassword, terms] = useWatch({
     control,
-    name: ['name', 'email', 'unit', 'password'],
+    name: ['name', 'email', 'unit', 'password', 'confirmPassword', 'terms'],
   });
 
   const userInputs = useMemo(() => strengthUserInputs(name, email), [name, email]);
   const strength = usePasswordStrength(password, userInputs);
   const breach = useBreachCheck(password, password.length >= PASSWORD_MIN_LENGTH);
+  const strengthScore = password ? (strength?.score ?? null) : null;
 
   // Keep "passwords don't match" honest when the first password changes after confirming.
   useEffect(() => {
     if (getFieldState('confirmPassword').isTouched) void trigger('confirmPassword');
   }, [password, getFieldState, trigger]);
 
+  // The tower is built floor by floor as the form becomes valid; your typed unit lights up.
+  const progress = registrationProgress({
+    name,
+    email,
+    unit,
+    password,
+    confirmPassword,
+    terms,
+    strengthScore,
+    breached: breach.state === 'breached',
+  });
+  useEffect(() => {
+    useSceneStore
+      .getState()
+      .setRegistration({ progress, strength: strengthScore, unit: parseUnit(unit) });
+  }, [progress, strengthScore, unit]);
+
+  // Clicking a window on the tower fills in the unit.
+  useEffect(() => {
+    const scene = useSceneStore.getState();
+    scene.setPickUnit((picked) =>
+      setValue('unit', formatUnit(picked), {
+        shouldValidate: true,
+        shouldDirty: true,
+        shouldTouch: true,
+      }),
+    );
+    return () => scene.setPickUnit(null);
+  }, [setValue]);
+
   const onSubmit = handleSubmit(async (values) => {
     if (submitState !== 'idle') return;
+    const scene = useSceneStore.getState();
     setAlert(null);
     setSubmitState('loading');
+    scene.emit('submitting');
 
     try {
       const passwordProblem = await validateNewPassword(
@@ -86,6 +123,7 @@ export function RegisterForm() {
       );
       if (passwordProblem) {
         setSubmitState('idle');
+        scene.emit('error');
         setError('password', { type: 'policy', message: passwordProblem }, { shouldFocus: true });
         return;
       }
@@ -97,10 +135,12 @@ export function RegisterForm() {
         password: values.password,
       });
       setSubmitState('success');
+      scene.emit('success', parseUnit(session.user.unit));
       await wait(prefersReducedMotion ? 0 : SUCCESS_HOLD_MS);
       signIn(session, true);
     } catch (error) {
       setSubmitState('idle');
+      scene.emit('error');
       if (error instanceof ApiError) {
         const handled = applyServerFieldErrors(error.fieldErrors, SERVER_FIELDS, setError);
         if (!handled) setAlert(error.message);

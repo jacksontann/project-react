@@ -1,8 +1,11 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AnimatePresence, m } from 'framer-motion';
 import { Link, useLocation, useOutlet } from 'react-router';
 import { AppShell, type ShellMode } from 'components/layout/AppShell';
 import { Logo } from 'components/ui/Logo';
+import { MotionToggle } from 'features/scene/MotionToggle';
+import { SceneStage } from 'features/scene/SceneStage';
+import { useSceneStore } from 'features/scene/sceneStore';
 import { easeOutExpo } from 'lib/motion';
 
 function shellModeFor(pathname: string): ShellMode {
@@ -20,10 +23,17 @@ function FrozenOutlet() {
 
 export function RootLayout() {
   const location = useLocation();
+  const mode = shellModeFor(location.pathname);
+
+  useEffect(() => {
+    useSceneStore.getState().setMode(mode);
+  }, [mode]);
 
   return (
     <AppShell
-      mode={shellModeFor(location.pathname)}
+      mode={mode}
+      scene={<SceneStage />}
+      controls={<MotionToggle />}
       brand={
         <Link to="/" aria-label="Lumen — start" className="block rounded-md">
           <Logo />
