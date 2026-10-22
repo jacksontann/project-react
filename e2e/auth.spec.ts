@@ -41,7 +41,10 @@ test.describe('resident journey', () => {
     await expect(page.getByText(/already registered/i)).toBeVisible();
 
     await page.getByRole('link', { name: 'Sign in' }).click();
-    await page.getByRole('button', { name: /use the demo resident/i }).click();
+    // Wait for the sign-in page itself: the registration page is still animating out.
+    await expect(page.getByRole('heading', { name: /welcome home/i })).toBeVisible();
+    await page.getByLabel('Email').fill('demo@lumen.my');
+    await page.getByLabel('Password', { exact: true }).fill('Lumen-Demo-2026!');
     await page.getByRole('button', { name: /^sign in/i }).click();
     await expect(page).toHaveURL(/\/home$/);
     await expect(page.getByRole('heading', { name: 'Lights on, Aisyah.' })).toBeVisible();

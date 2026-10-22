@@ -50,31 +50,4 @@ test.describe('@screenshots README images', () => {
     await page.waitForTimeout(400);
     await page.screenshot({ path: `${OUT}/register.png` });
   });
-
-  test('signed-in home (desktop)', async ({ page }) => {
-    await page.goto('/login');
-    await sceneSettled(page);
-    await page.getByRole('button', { name: /use the demo resident/i }).click();
-    await page.getByRole('button', { name: /^sign in/i }).click();
-    await expect(page.getByRole('heading', { name: 'Lights on, Aisyah.' })).toBeVisible();
-    await page.waitForTimeout(4000);
-    await hideCursor(page);
-    await page.screenshot({ path: `${OUT}/home.png` });
-  });
-
-  test.describe('mobile', () => {
-    test.use({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, hasTouch: true });
-
-    test('sign-in and registration (phone)', async ({ page }) => {
-      await page.goto('/login');
-      await sceneSettled(page);
-      await page.screenshot({ path: `${OUT}/login-mobile.png` });
-
-      await page.goto('/register');
-      await sceneSettled(page);
-      await page.getByLabel('Unit no.').pressSequentially('1803');
-      await page.waitForTimeout(1500);
-      await page.screenshot({ path: `${OUT}/register-mobile.png` });
-    });
-  });
 });

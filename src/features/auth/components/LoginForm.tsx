@@ -14,7 +14,6 @@ import { ApiError } from 'lib/http';
 import { wait } from 'lib/wait';
 import { authApi } from '../api';
 import { useAuth } from '../AuthProvider';
-import { DEMO_ACCOUNT } from '../demo';
 import { applyServerFieldErrors } from '../formErrors';
 import { loginFormSchema, type LoginFormInput, type LoginFormOutput } from '../schemas';
 import { parseUnit } from '../unit';
@@ -36,7 +35,6 @@ export function LoginForm() {
     handleSubmit,
     setError,
     setFocus,
-    setValue,
     resetField,
     formState: { errors },
   } = useForm<LoginFormInput, unknown, LoginFormOutput>({
@@ -99,12 +97,6 @@ export function LoginForm() {
     }
   }, signalSceneError);
 
-  const fillDemoAccount = () => {
-    setValue('email', DEMO_ACCOUNT.email, { shouldValidate: true, shouldDirty: true });
-    setValue('password', DEMO_ACCOUNT.password, { shouldValidate: true, shouldDirty: true });
-    setFocus('password');
-  };
-
   return (
     <form onSubmit={onSubmit} noValidate className="mt-8">
       <FormAlert message={alert} />
@@ -146,17 +138,6 @@ export function LoginForm() {
           </>
         )}
       </Button>
-
-      <p className="mt-4 text-center text-[13px] text-ink-faint">
-        Just looking around?{' '}
-        <button
-          type="button"
-          onClick={fillDemoAccount}
-          className="rounded-sm text-ink-muted underline decoration-line-strong underline-offset-4 transition-colors hover:text-ink hover:decoration-lamp"
-        >
-          Use the demo resident
-        </button>
-      </p>
     </form>
   );
 }

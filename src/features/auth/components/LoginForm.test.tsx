@@ -90,14 +90,6 @@ describe('Sign-in page', () => {
     expect(window.localStorage.getItem('lumen.session')).toBe('token-123');
   });
 
-  it('can fill in the demo resident for reviewers', async () => {
-    const user = userEvent.setup();
-    renderRoute('/login');
-    await user.click(await screen.findByRole('button', { name: /use the demo resident/i }));
-    expect(screen.getByLabelText('Email')).toHaveValue('demo@lumen.my');
-    expect(screen.getByLabelText('Password')).not.toHaveValue('');
-  });
-
   it('toggles password visibility accessibly', async () => {
     const user = userEvent.setup();
     renderRoute('/login');

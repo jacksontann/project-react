@@ -75,7 +75,8 @@ export function AuthPanel({ children, className }: { children: ReactNode; classN
         animate={{ height }}
         transition={{ duration: 0.5, ease: easeOutExpo }}
       >
-        <div ref={contentRef} className="px-6 pb-10 pt-8 sm:px-10 sm:py-10">
+        {/* Extra bottom room on phones for the credit line at the foot of the page. */}
+        <div ref={contentRef} className="px-6 pb-16 pt-8 sm:px-10 sm:py-10">
           {children}
         </div>
       </m.div>
