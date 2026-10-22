@@ -58,6 +58,17 @@
   }
 }
 
+@layer components {
+  /* Faint drafting grid shown while registering ("blueprint" mode). */
+  .blueprint-grid {
+    background-image:
+      linear-gradient(rgb(var(--blueprint) / 0.07) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(var(--blueprint) / 0.07) 1px, transparent 1px);
+    background-size: 28px 28px;
+    mask-image: radial-gradient(ellipse 70% 80% at 30% 55%, black 20%, transparent 75%);
+  }
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;

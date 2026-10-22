@@ -36,6 +36,15 @@ module.exports = {
         'out-expo': 'cubic-bezier(0.16, 1, 0.3, 1)',
         'in-out-quart': 'cubic-bezier(0.65, 0, 0.35, 1)',
       },
+      keyframes: {
+        progress: {
+          '0%': { transform: 'translateX(-100%)' },
+          '100%': { transform: 'translateX(400%)' },
+        },
+      },
+      animation: {
+        progress: 'progress 1.1s cubic-bezier(0.65, 0, 0.35, 1) infinite',
+      },
     },
   },
   plugins: [],
