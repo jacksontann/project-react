@@ -63,7 +63,7 @@ export const registerFormSchema = registerRequestSchema
   })
   .refine((values) => values.password === values.confirmPassword, {
     path: ['confirmPassword'],
-    message: "Passwords don't match.",
+    message: "Passwords don't match.", // see formResolvers.ts for the eager check
   });
 
 export const userSchema = z.object({

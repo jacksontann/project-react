@@ -44,7 +44,8 @@ export function AuthPanel({ children, className }: { children: ReactNode; classN
       useSceneStore.subscribe((state, previous) => {
         if (state.event !== 'error' || state.eventAt === previous.eventAt) return;
         if (state.reducedMotion) return;
-        panelRef.current?.animate(SHAKE, {
+        // Optional call: environments without the Web Animations API simply skip the shake.
+        panelRef.current?.animate?.(SHAKE, {
           duration: 340,
           easing: 'cubic-bezier(0.36, 0.07, 0.19, 0.97)',
         });
@@ -56,12 +57,14 @@ export function AuthPanel({ children, className }: { children: ReactNode; classN
     <section
       ref={panelRef}
       className={cn(
-        'pointer-events-auto relative w-full flex-1 overflow-hidden rounded-t-panel bg-glass/80 shadow-panel ring-1 ring-line backdrop-blur-2xl',
+        'pointer-events-auto relative w-full flex-1 overflow-clip rounded-t-panel bg-glass/80 shadow-panel ring-1 ring-line backdrop-blur-2xl',
         'sm:my-24 sm:w-[440px] sm:flex-none sm:rounded-panel',
         className,
       )}
     >
-      {/* Faint warm spill in the top-right corner, echoing the lit pane in the logo. */}
+      {/* Faint warm spill in the top-right corner, echoing the lit pane in the logo.
+          overflow-clip (not hidden): the glow overhangs, and a scroll container could be
+          scrolled sideways by focus() calls. */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute -right-28 -top-28 size-72 rounded-full bg-lamp/[0.09] blur-3xl"

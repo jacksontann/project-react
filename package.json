@@ -10,12 +10,13 @@
     "start": "cross-env PORT=3333 react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
+    "test:ci": "cross-env CI=true react-scripts test --watchAll=false",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src --ext .ts,.tsx --max-warnings=0",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "analyze": "source-map-explorer \"build/static/js/*.js\"",
-    "e2e": "playwright test",
+    "e2e": "playwright test --grep-invert @screenshots",
     "screenshots": "playwright test --grep @screenshots"
   },
   "dependencies": {

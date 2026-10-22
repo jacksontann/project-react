@@ -4,6 +4,7 @@ import { cn } from 'lib/cn';
 import { afterLoad, isConstrainedDevice } from 'lib/schedule';
 import { ScenePoster } from './ScenePoster';
 import { useSceneStore } from './sceneStore';
+import { UnitCallout } from './UnitCallout';
 
 const Scene = lazy(() => import('./Scene'));
 
@@ -73,6 +74,7 @@ export function SceneStage() {
           ready && 'opacity-0',
         )}
       />
+      <UnitCallout />
     </div>
   );
 }

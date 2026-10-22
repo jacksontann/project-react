@@ -2,12 +2,12 @@ import { useEffect, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { PerformanceMonitor } from '@react-three/drei';
 import { useSceneStore } from './sceneStore';
+import { CalloutTracker } from './three/CalloutTracker';
 import { CameraRig } from './three/CameraRig';
 import { Effects } from './three/Effects';
 import { Environment, FOG_COLOR, FOG_DENSITY } from './three/environment';
 import { Skyline } from './three/Skyline';
 import { Tower } from './three/Tower';
-import { UnitCallout } from './three/UnitCallout';
 
 /**
  * Lazy-loaded entry point: everything three.js lives behind this module boundary.
@@ -36,8 +36,9 @@ export default function Scene({ lowPower: initialLowPower = false }: { lowPower?
       <Environment />
       <Skyline />
       <Tower />
-      <UnitCallout />
       <CameraRig />
+      {/* After the rig, so the callout follows this frame's camera. */}
+      <CalloutTracker />
       {lowPower ? null : <Effects />}
 
       <RenderOnStoreChange />

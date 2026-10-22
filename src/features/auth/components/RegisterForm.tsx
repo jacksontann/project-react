@@ -1,6 +1,5 @@
 import { useEffect, useId, useMemo, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { useReducedMotion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { Button, type ButtonState } from 'components/ui/Button';
@@ -18,12 +17,8 @@ import { useBreachCheck } from '../hooks/useBreachCheck';
 import { usePasswordStrength } from '../hooks/usePasswordStrength';
 import { loadStrengthEngine, strengthUserInputs, validateNewPassword } from '../passwordPolicy';
 import { registrationProgress } from '../registrationProgress';
-import {
-  PASSWORD_MIN_LENGTH,
-  registerFormSchema,
-  type RegisterFormInput,
-  type RegisterFormOutput,
-} from '../schemas';
+import { registerFormResolver } from '../formResolvers';
+import { PASSWORD_MIN_LENGTH, type RegisterFormInput, type RegisterFormOutput } from '../schemas';
 import { formatUnit, parseUnit } from '../unit';
 import { HouseRulesDialog } from './HouseRulesDialog';
 import { PasswordInsights } from './PasswordInsights';
@@ -52,7 +47,7 @@ export function RegisterForm() {
     getFieldState,
     formState: { errors },
   } = useForm<RegisterFormInput, unknown, RegisterFormOutput>({
-    resolver: zodResolver(registerFormSchema),
+    resolver: registerFormResolver,
     mode: 'onTouched',
     defaultValues: {
       name: '',
