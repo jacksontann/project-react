@@ -24,20 +24,29 @@ export const STRENGTH_LABELS: Record<StrengthScore, string> = {
 let engine: Promise<Evaluate> | null = null;
 
 /**
- * zxcvbn and its dictionaries are ~800 KB, so they load on demand (first focus of a new-password
- * field) in their own chunk and never block the initial render.
+ * zxcvbn loads on demand (first focus of a new-password field) in separate chunks, so it never
+ * blocks the initial render. Dictionaries are picked individually: common passwords, diceware,
+ * English common words and first names (~340 KB gzipped). US surnames and Wikipedia words are
+ * skipped (they'd add ~440 KB); the resident's own name is penalised via user inputs, and the
+ * breach check catches leaked passwords regardless.
  */
 export function loadStrengthEngine() {
   engine ??= Promise.all([
     import('@zxcvbn-ts/core'),
     import('@zxcvbn-ts/language-common'),
-    import('@zxcvbn-ts/language-en'),
+    import('@zxcvbn-ts/language-en/dist/translations.js'),
+    import('@zxcvbn-ts/language-en/dist/commonWords.json.js'),
+    import('@zxcvbn-ts/language-en/dist/firstnames.json.js'),
   ])
-    .then(([core, common, en]) => {
+    .then(([core, common, translations, commonWords, firstnames]) => {
       core.zxcvbnOptions.setOptions({
-        translations: en.translations,
+        translations: translations.default,
         graphs: common.adjacencyGraphs,
-        dictionary: { ...common.dictionary, ...en.dictionary },
+        dictionary: {
+          ...common.dictionary,
+          commonWords: commonWords.default,
+          firstnames: firstnames.default,
+        },
       });
       const evaluate: Evaluate = (password, userInputs) => {
         const result = core.zxcvbn(password, userInputs);

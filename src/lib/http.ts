@@ -48,6 +48,25 @@ const KNOWN_CODES = new Set<string>([
   'UNAUTHENTICATED',
 ]);
 
+let prepare: (() => Promise<unknown>) | null = null;
+let prepared: Promise<unknown> | null = null;
+
+/**
+ * Registers async setup every request must wait for (here: starting the in-browser mock API).
+ * It runs lazily — on the first request or when warmed up via `prepareRequests()` — so it
+ * never delays the first paint.
+ */
+export function setRequestGate(setup: () => Promise<unknown>) {
+  prepare = setup;
+  prepared = null;
+}
+
+export function prepareRequests() {
+  if (!prepare) return Promise.resolve();
+  prepared ??= prepare().catch(() => undefined);
+  return prepared;
+}
+
 interface HttpOptions {
   method?: 'GET' | 'POST';
   body?: unknown;
@@ -68,6 +87,8 @@ export async function http<T>(
   const headers: Record<string, string> = { Accept: 'application/json' };
   if (body !== undefined) headers['Content-Type'] = 'application/json';
   if (token) headers.Authorization = `Bearer ${token}`;
+
+  await prepareRequests();
 
   let response: Response;
   try {

@@ -1,11 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import '@fontsource-variable/geist';
+// Geist + Instrument Serif are self-hosted and preloaded in public/index.html (LCP-critical).
 import '@fontsource-variable/geist-mono';
-import '@fontsource/instrument-serif/400.css';
-import '@fontsource/instrument-serif/400-italic.css';
 import 'styles/globals.css';
 import { App } from 'app/App';
+import { prepareRequests, setRequestGate } from 'lib/http';
+import { afterLoad } from 'lib/schedule';
 
 /**
  * There is no backend: the auth API is served in the browser by Mock Service Worker, in
@@ -14,21 +14,24 @@ import { App } from 'app/App';
  */
 async function startMockApi() {
   if (process.env.REACT_APP_API_MOCKING === 'off') return;
-  const { worker } = await import('mocks/browser');
-  await worker.start({
-    onUnhandledRequest: 'bypass',
-    quiet: process.env.NODE_ENV === 'production',
-  });
+  try {
+    const { worker } = await import('mocks/browser');
+    await worker.start({
+      onUnhandledRequest: 'bypass',
+      quiet: process.env.NODE_ENV === 'production',
+    });
+  } catch (error) {
+    console.error('[Lumen] Mock API failed to start', error);
+  }
 }
 
-const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
+// API calls wait for the mock; the first paint doesn't. It starts on the first request
+// (e.g. restoring a session) or, at the latest, shortly after the page has loaded and settled.
+setRequestGate(startMockApi);
+afterLoad(() => void prepareRequests(), { delay: 1500 });
 
-startMockApi()
-  .catch((error: unknown) => console.error('[Lumen] Mock API failed to start', error))
-  .finally(() => {
-    root.render(
-      <React.StrictMode>
-        <App />
-      </React.StrictMode>,
-    );
-  });
+ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+);

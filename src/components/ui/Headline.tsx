@@ -1,5 +1,6 @@
-import { Fragment } from 'react';
+import { Fragment, useState } from 'react';
 import { m } from 'framer-motion';
+import { hasUserInteracted } from 'lib/interaction';
 import { easeOutExpo } from 'lib/motion';
 
 interface HeadlineProps {
@@ -13,8 +14,12 @@ interface HeadlineProps {
  * Display headline whose words rise out of a mask one after another. The text stays plain
  * inline content, so screen readers read it as a normal sentence. Focusable (tabIndex -1) so
  * focus can move here after a route change.
+ *
+ * The reveal plays on navigations, not on the very first paint: the headline is the page's
+ * Largest Contentful Paint, and a masked reveal keeps re-reporting LCP until it finishes.
  */
 export function Headline({ lead, accent }: HeadlineProps) {
+  const [reveal] = useState(hasUserInteracted);
   const words = [
     ...lead.split(' ').map((text) => ({ text, accent: false })),
     ...accent.split(' ').map((text) => ({ text, accent: true })),
@@ -31,7 +36,7 @@ export function Headline({ lead, accent }: HeadlineProps) {
           <span className="-mb-[0.16em] inline-block overflow-hidden pb-[0.16em] pr-[0.05em] align-bottom">
             <m.span
               className="inline-block"
-              initial={{ y: '108%' }}
+              initial={reveal ? { y: '108%' } : false}
               animate={{ y: '0%' }}
               transition={{ duration: 0.75, ease: easeOutExpo, delay: 0.06 + index * 0.07 }}
             >

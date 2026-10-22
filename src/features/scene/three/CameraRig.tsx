@@ -18,7 +18,7 @@ const TOWER_CENTER = new Vector3(0, 6.3, 0);
 /** Pulls the camera back on small screens so the whole tower fits its slot. */
 const DISTANCE_SCALE: Record<Layout, { overview: number; focus: number }> = {
   wide: { overview: 1, focus: 1 },
-  medium: { overview: 1.08, focus: 1.1 },
+  medium: { overview: 1.4, focus: 1.45 },
   narrow: { overview: 1.05, focus: 1.15 },
 };
 
@@ -64,15 +64,15 @@ export function CameraRig() {
     return () => window.removeEventListener('pointermove', onMove);
   }, []);
 
-  // Shift the projection so the tower sits beside the panel (desktop) or above it (phones),
-  // without changing perspective.
+  // Shift the projection without changing perspective: beside the panel on desktop, rising
+  // behind the centred panel on tablets, above the bottom sheet on phones.
   useLayoutEffect(() => {
     const { width, height } = size;
     const offset =
       layout === 'wide'
         ? { x: width * 0.2, y: 0 }
         : layout === 'medium'
-          ? { x: width * 0.3, y: 0 }
+          ? { x: 0, y: height * 0.14 }
           : { x: 0, y: height * 0.07 };
     camera.setViewOffset(width, height, offset.x, offset.y, width, height);
     camera.updateProjectionMatrix();

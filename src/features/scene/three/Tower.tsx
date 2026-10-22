@@ -72,7 +72,8 @@ export function Tower() {
         : MathUtils.damp(buildLine.current, target, 2.2, Math.min(delta, 0.1));
     solidClip[0]!.constant = buildLine.current;
     blueprintClip[0]!.constant = -buildLine.current;
-  });
+    // Negative priority: runs before the children read buildLine in the same frame.
+  }, -1);
 
   return (
     <group>

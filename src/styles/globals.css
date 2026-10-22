@@ -10,7 +10,8 @@
     --glass: 14 16 23;
     --text-1: 244 241 234;
     --text-2: 167 169 180;
-    --text-3: 110 113 125;
+    /* ≥ 4.5:1 on the night background, so small mono labels pass WCAG AA. */
+    --text-3: 138 141 153;
     --lamp: 255 181 71;
     --lamp-soft: 255 217 160;
     --lamp-ink: 26 18 6;

@@ -1,6 +1,7 @@
 import { Component, lazy, Suspense, useEffect, useState, type ReactNode } from 'react';
 import { useReducedMotion } from 'framer-motion';
 import { cn } from 'lib/cn';
+import { afterLoad, isConstrainedDevice } from 'lib/schedule';
 import { ScenePoster } from './ScenePoster';
 import { useSceneStore } from './sceneStore';
 
@@ -13,17 +14,6 @@ function supportsWebGL() {
   } catch {
     return false;
   }
-}
-
-/** Download the 3D scene only once the page is idle, so the form is usable first. */
-function whenIdle(callback: () => void) {
-  // Safari only recently shipped requestIdleCallback; fall back to a short timeout.
-  if (typeof window.requestIdleCallback === 'function') {
-    const id = window.requestIdleCallback(callback, { timeout: 1500 });
-    return () => window.cancelIdleCallback(id);
-  }
-  const id = window.setTimeout(callback, 200);
-  return () => window.clearTimeout(id);
 }
 
 /** If the scene chunk or WebGL context fails, keep the poster rather than breaking the page. */
@@ -41,6 +31,7 @@ class SceneBoundary extends Component<{ children: ReactNode }, { failed: boolean
 
 export function SceneStage() {
   const [load, setLoad] = useState(false);
+  const [constrained] = useState(isConstrainedDevice);
   const ready = useSceneStore((s) => s.ready);
   const hovered = useSceneStore((s) => s.hovered);
   const reducedMotion = useReducedMotion();
@@ -49,10 +40,13 @@ export function SceneStage() {
     useSceneStore.getState().setReducedMotion(!!reducedMotion);
   }, [reducedMotion]);
 
+  // The poster paints instantly; WebGL is a progressive enhancement that never competes with
+  // first paint or the first keystrokes. Desktops load it once the page is idle; phones and
+  // low-power devices wait until the page has fully settled.
   useEffect(() => {
     if (!supportsWebGL()) return;
-    return whenIdle(() => setLoad(true));
-  }, []);
+    return afterLoad(() => setLoad(true), constrained ? { delay: 3500, idleTimeout: 4000 } : {});
+  }, [constrained]);
 
   return (
     <div
@@ -69,7 +63,7 @@ export function SceneStage() {
       {load ? (
         <SceneBoundary>
           <Suspense fallback={null}>
-            <Scene />
+            <Scene lowPower={constrained} />
           </Suspense>
         </SceneBoundary>
       ) : null}

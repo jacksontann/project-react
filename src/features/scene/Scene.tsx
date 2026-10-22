@@ -9,11 +9,15 @@ import { Skyline } from './three/Skyline';
 import { Tower } from './three/Tower';
 import { UnitCallout } from './three/UnitCallout';
 
-/** Lazy-loaded entry point: everything three.js lives behind this module boundary. */
-export default function Scene() {
+/**
+ * Lazy-loaded entry point: everything three.js lives behind this module boundary.
+ * `lowPower` (phones, Data Saver, low-end hardware) starts without post-processing at DPR 1;
+ * PerformanceMonitor can also switch to it at runtime if frame rate drops.
+ */
+export default function Scene({ lowPower: initialLowPower = false }: { lowPower?: boolean }) {
   const paused = useSceneStore((s) => s.paused);
   const reducedMotion = useSceneStore((s) => s.reducedMotion);
-  const [lowPower, setLowPower] = useState(false);
+  const [lowPower, setLowPower] = useState(initialLowPower);
 
   return (
     <Canvas
