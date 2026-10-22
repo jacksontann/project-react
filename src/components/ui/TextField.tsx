@@ -23,6 +23,7 @@ export function TextField({
   status,
   id,
   className,
+  'aria-describedby': extraDescribedBy,
   ...inputProps
 }: TextFieldProps) {
   const autoId = useId();
@@ -30,7 +31,11 @@ export function TextField({
   const hintId = `${inputId}-hint`;
   const errorId = `${inputId}-error`;
   const statusId = `${inputId}-status`;
-  const describedBy = [error ? errorId : hint ? hintId : null, status ? statusId : null]
+  const describedBy = [
+    error ? errorId : hint ? hintId : null,
+    status ? statusId : null,
+    extraDescribedBy,
+  ]
     .filter(Boolean)
     .join(' ');
 
