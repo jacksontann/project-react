@@ -1,0 +1,15 @@
+{
+  "short_name": "Lumen",
+  "name": "Lumen Residences",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#06070A",
+  "background_color": "#06070A"
+}

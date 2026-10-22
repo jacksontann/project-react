@@ -1,0 +1,86 @@
+{
+  "name": "project-react",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Lumen: resident sign-in and registration for a fictional Kuala Lumpur residence. React + TypeScript (Create React App).",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "cross-env PORT=3333 react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src --ext .ts,.tsx --max-warnings=0",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "analyze": "source-map-explorer \"build/static/js/*.js\"",
+    "e2e": "playwright test",
+    "screenshots": "playwright test --grep @screenshots"
+  },
+  "dependencies": {
+    "@fontsource-variable/geist": "^5.3.0",
+    "@fontsource-variable/geist-mono": "^5.3.0",
+    "@fontsource/instrument-serif": "^5.3.0",
+    "@hookform/resolvers": "^5.9.2",
+    "@react-three/drei": "^10.7.9",
+    "@react-three/fiber": "^9.8.2",
+    "@react-three/postprocessing": "^3.2.2",
+    "@zxcvbn-ts/core": "^3.0.4",
+    "@zxcvbn-ts/language-common": "^3.0.4",
+    "@zxcvbn-ts/language-en": "^3.0.2",
+    "clsx": "^2.1.1",
+    "framer-motion": "^12.43.0",
+    "lucide-react": "^0.577.0",
+    "maath": "^0.10.8",
+    "msw": "^2.15.0",
+    "postprocessing": "^6.39.5",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "react-hook-form": "^7.90.0",
+    "react-router": "^7.18.4",
+    "react-scripts": "5.0.1",
+    "tailwind-merge": "^2.6.1",
+    "three": "^0.186.1",
+    "zod": "^3.25.76",
+    "zustand": "^5.0.16"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.1",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/jest": "^27.5.2",
+    "@types/jest-axe": "^3.5.9",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@types/three": "^0.186.0",
+    "cross-env": "^10.1.0",
+    "jest-axe": "^10.0.0",
+    "prettier": "^3.9.0",
+    "prettier-plugin-tailwindcss": "^0.6.14",
+    "source-map-explorer": "^2.5.3",
+    "tailwindcss": "^3.4.19",
+    "typescript": "~5.9.3"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
