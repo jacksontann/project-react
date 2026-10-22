@@ -11,12 +11,28 @@ async function sceneSettled(page: Page) {
   await page.waitForTimeout(3500);
 }
 
+async function hideCursor(page: Page) {
+  await page.addStyleTag({ content: '.custom-cursor { display: none !important; }' });
+}
+
+/** Sweeps the pointer over the tower until it rests on a window ("FLR · UNIT · Click to pick"). */
+async function hoverAWindow(page: Page) {
+  for (let y = 380; y <= 720; y += 16) {
+    for (let x = 320; x <= 560; x += 14) {
+      await page.mouse.move(x, y);
+      const label = await page.locator('.custom-cursor').innerText();
+      if (/click to pick/i.test(label)) return;
+    }
+  }
+}
+
 test.describe('@screenshots README images', () => {
   test.describe.configure({ mode: 'serial' });
 
   test('sign-in (desktop)', async ({ page }) => {
     await page.goto('/login');
     await sceneSettled(page);
+    await hideCursor(page);
     await page.screenshot({ path: `${OUT}/login.png` });
   });
 
@@ -29,8 +45,9 @@ test.describe('@screenshots README images', () => {
     await page.getByLabel('Password', { exact: true }).fill('lantern orchid tramline 47');
     await expect(page.getByText(/not found in known data breaches/i)).toBeVisible();
     await page.getByLabel('Full name').click();
-    await page.mouse.move(700, 450);
     await page.waitForTimeout(2500);
+    await hoverAWindow(page);
+    await page.waitForTimeout(400);
     await page.screenshot({ path: `${OUT}/register.png` });
   });
 
@@ -40,8 +57,8 @@ test.describe('@screenshots README images', () => {
     await page.getByRole('button', { name: /use the demo resident/i }).click();
     await page.getByRole('button', { name: /^sign in/i }).click();
     await expect(page.getByRole('heading', { name: 'Lights on, Aisyah.' })).toBeVisible();
-    await page.mouse.move(1300, 860);
     await page.waitForTimeout(4000);
+    await hideCursor(page);
     await page.screenshot({ path: `${OUT}/home.png` });
   });
 
